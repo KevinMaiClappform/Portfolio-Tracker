@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Simulation</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f6f8;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Portfolio Simulation Result</h1>
+    
+    <!-- Plotly Chart -->
+    <div id="simulation-chart"></div>
+
+    <!-- Button to Go Back -->
+    <a href="{{ url_for('homepage') }}">
+        <button>Back to Homepage</button>
+    </a>
+
+    <!-- Render the Plotly Graph -->
+    <script type="text/javascript">
+        var graphData = {{ graphJSON | safe }};
+        Plotly.newPlot('simulation-chart', graphData.data, graphData.layout);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Tracker - Home</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f8; }
+        h1 { color: #333; }
+        form { margin-bottom: 30px; }
+        input, select { margin: 5px 0; padding: 8px; width: 100%; }
+        button { padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+        th { background-color: #007BFF; color: white; }
+        a { text-decoration: none; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Portfolio Tracker</h1>
+
+    <form method="POST">
+        <h2>Add New Asset</h2>
+        <input type="text" name="ticker" placeholder="Ticker (e.g., PEP)" required>
+        <input type="text" name="sector" placeholder="Sector" required>
+        <input type="text" name="asset_class" placeholder="Asset Class" required>
+        <input type="number" step="any" name="quantity" placeholder="Quantity" required>
+        <input type="number" step="any" name="purchase_price" placeholder="Purchase Price ($)" required>
+        <button type="submit">Add Asset</button>
+    </form>
+
+    {% if portfolio %}
+        <h2>Current Portfolio</h2>
+        <table>
+            <tr>
+                <th>Ticker</th>
+                <th>Sector</th>
+                <th>Asset Class</th>
+                <th>Quantity</th>
+                <th>Purchase Price</th>
+            </tr>
+            {% for asset in portfolio %}
+            <tr>
+                <td>{{ asset.ticker }}</td>
+                <td>{{ asset.sector }}</td>
+                <td>{{ asset.asset_class }}</td>
+                <td>{{ asset.quantity }}</td>
+                <td>${{ asset.purchase_price }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <button><a href="{{ url_for('simulate') }}">Run Simulation</a></button>
+    {% else %}
+        <p>No assets added yet. Add an asset above to start tracking your portfolio.</p>
+    {% endif %}
+
+</body>
+</html>
