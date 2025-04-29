@@ -62,7 +62,6 @@ Purchase price: 170
 3. View portfolio table
 4. Show weights
 5. Run simulation
-   
 q. Quit
 
 
