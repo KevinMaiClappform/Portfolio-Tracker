@@ -79,7 +79,7 @@ Pas wanneer je de simulatie plot weer sluit kan je in de terminal typen.
 **Aantal assets**:  
 Vanwege de individuele machine learning simulatie per asset, is het aanbevolen om maximaal **3 assets** tegelijk toe te voegen aan de portefeuille. 
 
-Per 1 asset duurt het 1 minuut langer om de Monte Carlo simulatie te runnen.
+Per 1 asset erbij duurt het 1 minuut langer om de Monte Carlo simulatie te runnen.
 
 Elke asset wordt afzonderlijk gesimuleerd met een eigen LightGBM-model, waarna de totale portefeuillegroei wordt berekend als som van de individuele simulaties.  
 Dit zorgt voor nauwkeurige resultaten maar vraagt ook aanzienlijke rekenkracht en geheugen.
