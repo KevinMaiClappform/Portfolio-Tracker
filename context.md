@@ -58,6 +58,22 @@ Om overfitting te minimaliseren, heb ik de volgende strategieën onderzocht:
 
 ---
 
+
+## Monte Carlo Simulatie
+
+Voor de Monte Carlo simulatie zijn **twee aparte LightGBM modellen** gebruikt:
+
+- Eén voor het voorspellen van toekomstige rendementen.
+- Eén voor het voorspellen van toekomstige volatiliteit.
+
+Dit stelt de simulatie in staat om optimaal gebruik te maken van moderne machine learning technieken, zoals in de opdracht werd gevraagd.
+
+
+
+
+
+
+
 ## Feature Importance / SHAP Analyse
 
 ### Volatiliteit
@@ -78,12 +94,39 @@ Voor de voorspelling van toekomstige rendementen bleek:
 
 ---
 
-## Monte Carlo Simulatie
 
-Voor de Monte Carlo simulatie zijn **twee aparte LightGBM modellen** gebruikt:
+## Feature Engineering & Modelkeuze – Uitleg
 
-- Eén voor het voorspellen van toekomstige rendementen.
-- Eén voor het voorspellen van toekomstige volatiliteit.
+### 🔍 Waarom deze features?
+De gekozen features zijn gebaseerd op bewezen signalen uit de financiële literatuur en technische analyse. Ze zijn bedoeld om zowel **trend**, **momentum** als **risico** te vangen:
 
-Dit stelt de simulatie in staat om optimaal gebruik te maken van moderne machine learning technieken, zoals in de opdracht werd gevraagd.
+| Feature                    | Reden voor keuze                                              |
+|----------------------------|---------------------------------------------------------------|
+| `return_1d`, `return_5d`   | Captureren kortetermijnmomentum (prijsverandering over 1 of 5 dagen). |
+| `ma_5`, `ma_10`            | Trendindicatoren: detecteren voortschrijdend koersgemiddelde. |
+| `vol_5d`, `vol_10d`, `vol_21d` | Schatting van volatiliteit: cruciaal voor risicoanalyse.    |
+| `abs_return_1d`, `squared_return_1d` | Alternatieve schattingen van volatiliteit; helpen bij robuustheid. |
+| `target_return`            | Gebaseerd op rolling average om noise in individuele returns te dempen. |
+
+---
+
+### Waarom  log returns?
+- **Log returns zijn additief over tijd** → handig voor cumulatieve simulaties.
+- Ze normaliseren extreme waarden beter dan gewone returns.
+- Worden standaard gebruikt in kwantitatieve finance.
+
+---
+
+### Waarom smoothing voor targets?
+Het gebruik van een **rolling mean voor target_return** helpt bij:
+- Vermijden van overfitting op ruis.
+- Beter generaliseerbare voorspellingen.
+- Meer stabiliteit in de simulatie op lange termijn.
+
+---
+
+Deze keuzes zijn essentieel om een portfolio simulatie te bouwen die realistische lange termijn rendementen en risico’s inschat, zonder te vervallen in extreme overfitting of onrealistische volatiliteit.
+
+
+
 
