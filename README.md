@@ -76,6 +76,26 @@ De simulatie gebruikt machine learning (lightGBM) voor voorspelling van rendemen
 Pas wanneer je de simulatie plot weer sluit kan je in de terminal typen.
 
 
+**Aantal assets**:  
+Vanwege de individuele machine learning simulatie per asset, is het aanbevolen om maximaal **3 assets** tegelijk toe te voegen aan de portefeuille. 
+
+Per 1 asset duurt het 1 minuut langer om de Monte Carlo simulatie te runnen.
+
+Elke asset wordt afzonderlijk gesimuleerd met een eigen LightGBM-model, waarna de totale portefeuillegroei wordt berekend als som van de individuele simulaties.  
+Dit zorgt voor nauwkeurige resultaten maar vraagt ook aanzienlijke rekenkracht en geheugen.
+
+➔ Tip: Voeg niet meer dan 3 assets toe om de prestaties en stabiliteit van de simulatie te waarborgen.
+
+---
+
+## Technische Specificaties
+
+- Elke asset heeft een eigen voorspelling van rendement en volatiliteit.
+- De simulatie combineert de paden van alle assets naar een totaalportefeuille.
+- Machine learning-algoritme: LightGBM Regressor.
+
+
+
 | Bestand                             | Functie                                        |
 |-------------------------------------|------------------------------------------------|
 | `main.py`                           | Startpunt van de applicatie                    |
