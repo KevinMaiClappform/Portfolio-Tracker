@@ -4,5 +4,6 @@ numpy
 matplotlib
 tabulate
 yfinance
-scikit-learnq
+scikit-learn
 lightgbm
+ta

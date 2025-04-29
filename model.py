@@ -21,7 +21,7 @@ class Portfolio:
         tickers = [asset['ticker'] for asset in self.assets]
         if not tickers:
             return pd.DataFrame()
-        data = yf.download(tickers, period="1y", auto_adjust=True)['Close']
+        data = yf.download(tickers, start='2015-01-01', end='2025-04-29', auto_adjust=True)['Close'].dropna()
         return data
 
     def get_portfolio_table(self):
@@ -48,9 +48,24 @@ class Portfolio:
     def calculate_weights(self):
         df = self.get_portfolio_table()
         if df.empty:
-            return pd.DataFrame()
+            return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
         df['weight'] = df['current_value'] / df['current_value'].sum()
-        return df[['ticker', 'weight', 'sector', 'asset_class']]
+
+        # Per asset (wat je nu al toont)
+        asset_weights = df[['ticker', 'weight', 'sector', 'asset_class']]
+
+        # Per sector
+        sector_weights = df.groupby('sector')['current_value'].sum()
+        sector_weights = (sector_weights / df['current_value'].sum()).reset_index()
+        sector_weights.columns = ['sector', 'weight']
+
+        # Per asset class
+        class_weights = df.groupby('asset_class')['current_value'].sum()
+        class_weights = (class_weights / df['current_value'].sum()).reset_index()
+        class_weights.columns = ['asset_class', 'weight']
+
+        return asset_weights, sector_weights, class_weights
+
 
     def run_simulation(self):
         df = self.get_prices()
@@ -60,12 +75,19 @@ class Portfolio:
         ticker = self.assets[0]['ticker']  # Simpelweg de eerste asset pakken
         price_data = df[ticker]
 
+
+
+        # Feature Engineering
         features = pd.DataFrame(index=price_data.index)
         features['return_1d'] = price_data.pct_change(1)
         features['return_5d'] = price_data.pct_change(5)
         features['ma_5'] = price_data.rolling(window=5).mean()
         features['ma_10'] = price_data.rolling(window=10).mean()
         features['vol_5d'] = price_data.pct_change().rolling(window=5).std()
+        features['abs_return_1d'] = features['return_1d'].abs()
+        features['squared_return_1d'] = features['return_1d']**2
+        features['vol_10d'] = price_data.pct_change().rolling(10).std()
+        features['vol_21d'] = price_data.pct_change().rolling(21).std()
         features = features.dropna()
 
         # Targets
@@ -78,10 +100,10 @@ class Portfolio:
         _, _, y_vol_train, y_vol_test = train_test_split(X, y_volatility, test_size=0.2, shuffle=False)
 
         # Train LightGBM modellen
-        model_return = LGBMRegressor()
+        model_return = LGBMRegressor(verbose=-1)
         model_return.fit(X_train, y_return_train)
 
-        model_vol = LGBMRegressor()
+        model_vol = LGBMRegressor(verbose=-1)
         model_vol.fit(X_train, y_vol_train)
 
         # Voorspellingen
@@ -92,10 +114,14 @@ class Portfolio:
         start_value = 10000
         n_years = 15
         n_days = n_years * 252
-        n_paths = 1000
+        n_paths = 100000
 
         simulations = np.zeros((n_days, n_paths))
         simulations[0] = start_value
+
+        # Create real dates for simulation
+        start_date_sim = pd.to_datetime('2025-01-01')
+        dates_sim = pd.date_range(start=start_date_sim, periods=n_days, freq='B')
 
         predicted_returns = np.resize(y_return_pred, n_days)
         predicted_vols = np.resize(y_vol_pred, n_days)
@@ -107,4 +133,25 @@ class Portfolio:
             shock = predicted_vols[t] * Z
             simulations[t] = simulations[t-1] * np.exp(drift + shock)
 
-        return simulations
+        # Analyse
+        final_values = simulations[-1]
+        annualized_returns = (final_values / start_value) ** (1 / n_years) - 1
+        mean_annual_return = np.mean(annualized_returns)
+
+        log_returns = np.log(simulations[1:] / simulations[:-1])
+        portfolio_volatility = np.std(log_returns, axis=0) * np.sqrt(252)
+        mean_annual_volatility = np.mean(portfolio_volatility)
+
+        sharpe_ratio = mean_annual_return / mean_annual_volatility
+
+        losses = start_value - final_values
+        var_5 = np.percentile(losses, 5)
+
+        metrics = {
+            'Mean Annual Return': mean_annual_return,
+            'Mean Annual Volatility': mean_annual_volatility,
+            'Sharpe Ratio': sharpe_ratio,
+            '5% VaR': var_5
+        }
+
+        return simulations, metrics, dates_sim

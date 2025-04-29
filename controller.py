@@ -6,17 +6,6 @@ class PortfolioController:
     def __init__(self):
         self.portfolio = Portfolio()
         self.view = View()
-        self.preload_pep()
-
-    def preload_pep(self):
-        # Automatisch PepsiCo (PEP) toevoegen bij opstarten
-        self.portfolio.add_asset(
-            ticker='PEP',
-            sector='Consumer Staples',
-            asset_class='Equity',
-            quantity=10,  # voorbeeld aantal aandelen
-            purchase_price=170.00  # voorbeeld aankoopprijs
-        )
 
     def run(self):
         while True:
@@ -31,10 +20,22 @@ class PortfolioController:
                 table = self.portfolio.get_portfolio_table()
                 self.view.display_table(table)
             elif choice == '4':
-                summary = self.portfolio.calculate_weights()
-                self.view.display_summary(summary)
+                asset_weights, sector_weights, class_weights = self.portfolio.calculate_weights()
+                print("\n=== Asset Weights ===")
+                self.view.display_summary(asset_weights)
+                print("\n=== Sector Weights ===")
+                self.view.display_summary(sector_weights)
+                print("\n=== Asset Class Weights ===")
+                self.view.display_summary(class_weights)
             elif choice == '5':
-                sim = self.portfolio.run_simulation()
-                self.view.plot_simulation(sim)
+                simulations, metrics, dates_sim = self.portfolio.run_simulation()
+                self.view.plot_simulation(simulations, dates_sim)
+            elif choice == '6':
+                simulations, metrics, dates_sim = self.portfolio.run_simulation()
+                self.view.display_metrics(metrics)
             elif choice == 'q':
                 break
+
+
+
+
