@@ -95,7 +95,7 @@ Voor de voorspelling van toekomstige rendementen bleek:
 ---
 
 
-## Feature Engineering & Modelkeuze – Uitleg
+## Feature Engineering & Modelkeuze voor Monte Carlo
 
 ### Waarom deze features?
 De gekozen features zijn gebaseerd op bewezen signalen uit de financiële literatuur en technische analyse. Ze zijn bedoeld om zowel **trend**, **momentum** als **risico** te vangen:
